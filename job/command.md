@@ -1,0 +1,1 @@
+python3 upload_job.py -filename job.py -bucket glue-hudi-bucket -awsprofile dev

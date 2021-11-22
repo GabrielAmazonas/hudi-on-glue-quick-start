@@ -1,0 +1,81 @@
+Description: "AWS Glue Job with Apache Hudi Jars Configured - Specifically for AWS Glue 2.0 - PySpark 3.0 and Apache Hudi 9.0"
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Bucket name for the S3 bucket resource
+    AllowedPattern: ^.*[^0-9]$
+    ConstraintDescription: Must end with non-numeric character.
+  GlueJobName:
+    Type: String
+    Description: Glue Job name for the Job resource
+    AllowedPattern: ^.*[^0-9]$
+    ConstraintDescription: Must end with non-numeric character.
+  HudiJobName:
+    Type: String
+    Description: Name of the Hudi Spark Jar file ("Ending in .py")
+    AllowedPattern: ^.*.py
+    ConstraintDescription: Must end with .py.
+  HudiSparkJarName:
+    Type: String
+    Description: Name of the Hudi Spark Jar file ("Ending in .jar")
+    AllowedPattern: ^.*.jar
+    ConstraintDescription: Must end .jar.
+  SparkAvroJarName:
+    Type: String
+    Description: Name of the Spark Avro Jar file ("Ending in .jar")
+    AllowedPattern: ^.*.jar
+    ConstraintDescription: Must end with .jar.
+Resources:
+  MyJobRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "glue.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+        - "-"
+        - - Ref: S3BucketName
+          - Ref: AWS::AccountId
+  MyJob:
+    Type: AWS::Glue::Job
+    Properties:
+      GlueVersion: "3.0"
+      Command:
+        Name: glueetl
+        ScriptLocation: !Sub "s3://${S3BucketName}-${AWS::AccountId}/jobs/${HudiJobName}"
+      DefaultArguments:
+        "--job-bookmark-option": "job-bookmark-enable"
+        "--enable-spark-ui": true
+        "--spark-event-logs-path" : !Sub "s3://${S3BucketName}-${AWS::AccountId}/tmp/spark-ui"
+        "--enable-glue-datacatalog": ""
+        "--base_s3_path" : !Sub "s3a://${S3BucketName}-${AWS::AccountId}"
+        "--extra-jars": !Sub "s3://${S3BucketName}-${AWS::AccountId}/jars/${HudiSparkJarName},s3://${S3BucketName}-${AWS::AccountId}/jars/${HudiSparkJarName},s3://crawler-public/json/serde/json-serde.jar"
+      ExecutionProperty:
+        MaxConcurrentRuns: 2
+      MaxRetries: 0
+      Name: !Ref GlueJobName
+      Role: !Ref MyJobRole
+
+  
