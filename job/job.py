@@ -72,8 +72,9 @@ tripsSnapshotDF = spark. \
     load(final_base_path)
 # load(final_base_path) use "/partitionKey=partitionValue" folder structure for Spark auto partition discovery
 
-
 print("Snapshot Count: " + str(tripsSnapshotDF.count()))
+
+tripsSnapshotDF.createOrReplaceTempView("hudi_trips_snapshot")
 
 # Query examples using Spark SQL
 spark.sql("select fare, begin_lon, begin_lat, ts from  hudi_trips_snapshot where fare > 20.0").show()
@@ -84,7 +85,7 @@ time_travel_df = spark.read.format("hudi").option(
     "as.of.instant", "20210728141108").load(final_base_path)
 
 time_travel_df = spark.read.format("hudi").option(
-    "as.of.instant", "2021-07-28 14: 11: 08").load(final_base_path)
+    "as.of.instant", "2021-07-28 14:11:08").load(final_base_path)
 
 # It is equal to "as.of.instant = 2021-07-28 00:00:00"
 time_travel_df = spark.read.format("hudi").option(
