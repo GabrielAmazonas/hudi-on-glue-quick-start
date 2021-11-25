@@ -27,7 +27,9 @@ glue-hudi-hello
 ├── jars
 │   ├── command.md
 │   ├── hudi-spark3-bundle_2.12-0.9.0.jar
-│   └── spark-avro_2.12-3.0.1.jar
+│   ├── spark-avro_2.12-3.0.1.jar
+│   └── upload_jar.py
+
 ├── job
 │   ├── command.md
 │   └── job.py
