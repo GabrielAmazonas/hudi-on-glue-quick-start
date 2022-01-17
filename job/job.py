@@ -35,7 +35,7 @@ fake_row_count = int(args['fake_row_count'])
 fake = Faker()
 
 fake_workers = [(
-        fake.unique.random_int(min=1, max=fake_row_count),
+        x,
         fake.name(),
         fake.random_element(elements=('IT', 'HR', 'Sales', 'Marketing')),
         fake.random_element(elements=('CA', 'NY', 'TX', 'FL', 'IL', 'RJ')),
@@ -63,7 +63,7 @@ sc = spark.sparkContext
 glueContext = GlueContext(sc)
 
 
-columns= ["emp_id", "employee_name","department","state","salary","age","bonus", "ts"]
+columns= ["emp_id", "employee_name","department","state","salary","age","bonus","ts"]
 emp_df = spark.createDataFrame(data = fake_workers, schema = columns)
 
 hudi_options = {
