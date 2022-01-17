@@ -70,12 +70,16 @@ Resources:
         "--enable-spark-ui": true
         "--spark-event-logs-path" : !Sub "s3://${S3BucketName}-${AWS::AccountId}/tmp/spark-ui"
         "--enable-glue-datacatalog": ""
+        "--fake_row_count" : "10"
         "--base_s3_path" : !Sub "s3a://${S3BucketName}-${AWS::AccountId}"
         "--extra-jars": !Sub "s3://${S3BucketName}-${AWS::AccountId}/jars/${HudiSparkJarName},s3://${S3BucketName}-${AWS::AccountId}/jars/${HudiSparkJarName},s3://crawler-public/json/serde/json-serde.jar"
+        "--additional-python-modules": "faker==11.3.0"
       ExecutionProperty:
         MaxConcurrentRuns: 2
       MaxRetries: 0
       Name: !Ref GlueJobName
       Role: !Ref MyJobRole
-
+      WorkerType: "Standard"
+      NumberOfWorkers: 2
+      Timeout: 10
   
